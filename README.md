@@ -6,7 +6,7 @@ The Smart Identity Ring is a next-generation solution designed to replace tradit
 •⁠  ⁠Anomaly Detection
 •⁠  ⁠FastAPI Backend + Kotlin Android App
 
-##Objective
+## Objective
 1. Eliminate the Need for Physical ID Cards
 2. Enable Real-Time, Contactless Authentication
 3.  Integrate AI for Intelligent Verification (ML-Based Anomaly Detection)
