@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Ring Scan</title>
+</head>
+<body style="font-family:sans-serif">
+    <h2> Live NFC Scan</h2>
+    <p>Tap an NFC Ring to fetch student info</p>
+    <div id="output"></div>
+
+    <script>
+        async function readNFC() {
+            if (!("NDEFReader" in window)) {
+                document.getElementById("output").innerHTML = " NFC not supported on this device.";
+                return;
+            }
+
+            try {
+                const ndef = new NDEFReader();
+                await ndef.scan();
+                document.getElementById("output").innerHTML = "📶 Scanning for NFC tag...";
+
+                ndef.onreading = async (event) => {
+                    const nfc_uid = event.serialNumber;
+                    const api_url = `http://172.17.3.2:8000/nfc-scan/${nfc_uid}?location=main_gate`;
+
+                    const res = await fetch(api_url);
+                    const result = await res.json();
+
+                    if (res.ok) {
+                        const student = result.student;
+                        document.getElementById("output").innerHTML = `
+                            ✅ <strong>Scan Successful</strong><br><br>
+                            <b>Name:</b> ${student.name}<br>
+                            <b>USN:</b> ${student.usn}<br>
+                            <b>Valid Upto:</b> ${student.valid_upto}<br><br>
+                            <img src="${student.profile_image}" width="150" style="border-radius:10px" />
+                        `;
+                    } else {
+                        document.getElementById("output").innerHTML = `❌ ${result.detail || "Unknown NFC UID"}`;
+                    }
+                };
+
+            } catch (error) {
+                document.getElementById("output").innerHTML = `❌ Error: ${error.message}`;
+            }
+        }
+
+        readNFC();
+    </script>
+</body>
+</html>

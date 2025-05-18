@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Student Logs</title>
+</head>
+<body>
+  <h2>📄 View and Download Logs</h2>
+  <label for="logDate">Date:</label>
+  <input type="date" id="logDate">
+  <label for="usn">USN:</label>
+  <input type="text" id="usn" placeholder="USN001">
+  <button onclick="fetchLogs()">View Logs</button>
+  <button onclick="downloadLogs()">Download Logs CSV</button>
+
+  <br><br>
+  <table border="1" id="logTable" style="display: none;">
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Location</th>
+        <th>Entry Time</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody id="logTableBody"></tbody>
+  </table>
+
+  <script>
+    async function fetchLogs() {
+      const date = document.getElementById("logDate").value;
+      const usn = document.getElementById("usn").value;
+
+      const query = [];
+      if (date) query.push(`date=${date}`);
+      if (usn) query.push(`usn=${usn}`);
+      const queryString = query.join("&");
+
+      const response = await fetch(`https://172.17.11.4:8000/logs/view?${queryString}`);
+      const result = await response.json();
+
+      const table = document.getElementById("logTable");
+      const tbody = document.getElementById("logTableBody");
+      tbody.innerHTML = "";
+
+      if (result.logs.length > 0) {
+        table.style.display = "table";
+        result.logs.forEach(log => {
+          const row = `<tr>
+            <td>${log.student_id}</td>
+            <td>${log.location}</td>
+            <td>${log.entry_time}</td>
+            <td>${log.entry_type}</td>
+          </tr>`;
+          tbody.innerHTML += row;
+        });
+      } else {
+        table.style.display = "none";
+        alert("No logs found for selected filters.");
+      }
+    }
+
+    function downloadLogs() {
+      const date = document.getElementById("logDate").value;
+      const usn = document.getElementById("usn").value;
+
+      const query = [];
+      if (date) query.push(`date=${date}`);
+      if (usn) query.push(`usn=${usn}`);
+      const queryString = query.join("&");
+
+      const downloadUrl = `https://172.17.11.4:8000/logs/download?${queryString}`;
+
+    }
+  </script>
+</body>
+</html>
